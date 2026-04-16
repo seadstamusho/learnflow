@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { adminAuth } from '@/lib/firebase-admin'
+import { verifyFirebaseIdToken, createSessionCookie } from '@/lib/session'
 
-const SESSION_DURATION_MS = 60 * 60 * 24 * 14 * 1000 // 14日間
+const SESSION_MAX_AGE = 60 * 60 * 24 * 14 // 14日間
 
 export async function POST(req: NextRequest) {
   let idToken: string
@@ -17,28 +17,26 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // IDトークンを検証してSession Cookieを発行
-    const sessionCookie = await adminAuth.createSessionCookie(idToken, {
-      expiresIn: SESSION_DURATION_MS,
-    })
+    // Firebase ID token を Google 公開鍵で検証（firebase-admin 不要）
+    const user = await verifyFirebaseIdToken(idToken)
+    const sessionCookie = await createSessionCookie(user)
 
     const res = NextResponse.json({ ok: true })
     res.cookies.set('firebase-session', sessionCookie, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 14, // 14日間
+      maxAge: SESSION_MAX_AGE,
       path: '/',
     })
     return res
   } catch (err) {
-    console.error('Session cookie creation failed:', err)
+    console.error('Session creation failed:', err)
     return NextResponse.json({ ok: false, error: 'Invalid token' }, { status: 401 })
   }
 }
 
 export async function DELETE() {
-  // ログアウト：Session Cookieを削除
   const res = NextResponse.json({ ok: true })
   res.cookies.set('firebase-session', '', {
     httpOnly: true,

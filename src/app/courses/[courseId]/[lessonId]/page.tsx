@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { adminAuth } from '@/lib/firebase-admin'
+import { verifySessionCookie } from '@/lib/session'
 import { fetchCourseMeta, fetchLessonMarkdown } from '@/lib/github'
 import { parseMarkdown } from '@/components/markdown/MarkdownRenderer'
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer'
@@ -31,10 +31,10 @@ export default async function LessonPage({ params }: Props) {
   let userPhotoURL: string | undefined
 
   try {
-    const decoded = await adminAuth.verifySessionCookie(session, true)
-    uid = decoded.uid
-    userName = decoded.name as string | undefined
-    userPhotoURL = decoded.picture as string | undefined
+    const user = await verifySessionCookie(session)
+    uid = user.uid
+    userName = user.name
+    userPhotoURL = user.picture
   } catch {
     redirect('/login')
   }

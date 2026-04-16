@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { adminAuth } from '@/lib/firebase-admin'
+import { verifySessionCookie } from '@/lib/session'
 import Header from '@/components/layout/Header'
 
 export default async function ProfilePage() {
@@ -13,10 +13,10 @@ export default async function ProfilePage() {
   let userPhotoURL: string | undefined
 
   try {
-    const decoded = await adminAuth.verifySessionCookie(session, true)
-    userName = decoded.name as string | undefined
-    userEmail = decoded.email as string | undefined
-    userPhotoURL = decoded.picture as string | undefined
+    const user = await verifySessionCookie(session)
+    userName = user.name
+    userEmail = user.email
+    userPhotoURL = user.picture
   } catch {
     redirect('/login')
   }
