@@ -2,13 +2,16 @@ import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
 import { getFirestore, type Firestore } from 'firebase/firestore'
 
+// Firebase クライアント設定（NEXT_PUBLIC_ 変数はビルド時埋め込みだが
+// Cloudflare Workers のビルド環境では届かないためここに直接記述する）
+// これらはブラウザ公開値なので秘密情報ではない
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: 'AIzaSyCeJD8fPxx1ja6UrZTZXKQbHvJ9jbfaZRs',
+  authDomain: 'learnflow-47c43.firebaseapp.com',
+  projectId: 'learnflow-47c43',
+  storageBucket: 'learnflow-47c43.firebasestorage.app',
+  messagingSenderId: '525362168506',
+  appId: '1:525362168506:web:6f9bbd3eab134bff727883',
 }
 
 // シングルトン初期化（ブラウザ専用 / HMR対策）
