@@ -6,10 +6,7 @@ import { fetchCourseMeta, fetchLessonMarkdown } from '@/lib/github'
 import { parseMarkdown } from '@/components/markdown/MarkdownRenderer'
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer'
 import OsTabHydrator from '@/components/markdown/OsTabHydrator'
-import dynamic from 'next/dynamic'
-// Firebase Firestore SDK は Cloudflare Workers の eval 制限に抵触するため
-// ssr: false でブラウザ専用バンドルに隔離する
-const ChecklistBlock = dynamic(() => import('@/components/markdown/ChecklistItem'), { ssr: false })
+import ChecklistWrapper from '@/components/markdown/ChecklistWrapper'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import ProgressBar from '@/components/layout/ProgressBar'
@@ -124,7 +121,7 @@ export default async function LessonPage({ params }: Props) {
               <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3">
                 ✅ 確認チェックリスト
               </h3>
-              <ChecklistBlock
+              <ChecklistWrapper
                 items={checklistItems[0]}
                 uid={verifiedUid}
                 courseId={courseId}
