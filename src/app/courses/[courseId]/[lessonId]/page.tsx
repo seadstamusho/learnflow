@@ -6,7 +6,10 @@ import { fetchCourseMeta, fetchLessonMarkdown } from '@/lib/github'
 import { parseMarkdown } from '@/components/markdown/MarkdownRenderer'
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer'
 import OsTabHydrator from '@/components/markdown/OsTabHydrator'
-import ChecklistBlock from '@/components/markdown/ChecklistItem'
+import dynamic from 'next/dynamic'
+// Firebase Firestore SDK は Cloudflare Workers の eval 制限に抵触するため
+// ssr: false でブラウザ専用バンドルに隔離する
+const ChecklistBlock = dynamic(() => import('@/components/markdown/ChecklistItem'), { ssr: false })
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import ProgressBar from '@/components/layout/ProgressBar'
