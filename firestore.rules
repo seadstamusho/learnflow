@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // プロフィール（users/{uid} ドキュメント直接）
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['name', 'email', 'photoURL', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.email is string;
+    }
+
+    // コース進捗サマリー
+    match /users/{userId}/progress/{courseId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+            'startedAt', 'updatedAt', 'totalLessons', 'completedLessons'
+          ])
+        && (
+            !('totalLessons' in request.resource.data)
+            || request.resource.data.totalLessons is int
+          )
+        && (
+            !('completedLessons' in request.resource.data)
+            || request.resource.data.completedLessons is int
+          );
+    }
+
+    // レッスン進捗
+    match /users/{userId}/progress/{courseId}/lessons/{lessonId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['completed', 'completedAt', 'orphaned'])
+        && request.resource.data.completed is bool;
+    }
+
+    // チェックリスト
+    match /users/{userId}/progress/{courseId}/checklists/{itemId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['checked', 'checkedAt', 'lessonId'])
+        && request.resource.data.checked is bool
+        && request.resource.data.lessonId is string;
+    }
+  }
+}
